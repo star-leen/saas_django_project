@@ -1,6 +1,13 @@
 Django>=5.0,<5.1
+# For Deployment:
 gunicorn
+# To access environmental variables in the .env file:
 python-decouple
+# To configure NeonPostgres:
 psycopg[binary]
 dj-database-url
+# For the Commando app do download vendor files i.e flowbite(Tailwind):
 requests
+# To manage static files:
+whitenoise
+# 
