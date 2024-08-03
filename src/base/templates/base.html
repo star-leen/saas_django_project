@@ -10,7 +10,7 @@
     <header>
         {% include 'navbar.html' %}
     </header>
-
+    {% include 'base/messages.html' with messages=messages %}
     {% block content %}
 
     {% endblock content %}

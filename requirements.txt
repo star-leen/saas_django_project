@@ -10,4 +10,11 @@ dj-database-url
 requests
 # To manage static files:
 whitenoise
-# 
+# User authentication (Django AllAuth):
+django-allauth[socialaccount]
+# Django AllAuth Stlying:
+django-allauth-ui
+django-widget-tweaks
+slippers
+# For handling payment and subscriptions:
+stripe

@@ -16,6 +16,26 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST= config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT= config("EMAIL_PORT", default="587")
+EMAIL_USE_TLS= config("EMAIL_USE_TLS", cast=bool,default=True)
+EMAIL_HOST_USER= config("EMAIL_HOST_USER", cast=str,default=None)
+EMAIL_HOST_PASSWORD= config("EMAIL_HOST_PASSWORD", cast=str, default=False)
+
+ADMIN_USERNAME = config('ADMIN_USERNAME', default='Admin user')
+ADMIN_EMAIL = config('ADMIN_EMAIL', default=None)
+
+ADMINS = []
+MANAGERS = []
+
+if all([ADMIN_USERNAME, ADMIN_EMAIL]):
+    ADMINS += [
+        (f'{ADMIN_USERNAME}, {ADMIN_EMAIL}')
+    ]
+    MANAGERS=ADMINS
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -25,7 +45,8 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', cast=bool)
-print('DEBUG: ', DEBUG, type(DEBUG))
+
+BASE_URL = config('BASE_URL', cast=str, default=None)
 
 ALLOWED_HOSTS = [
     ".railway.app" # https://saas.prod.railway.app
@@ -47,6 +68,18 @@ INSTALLED_APPS = [
     
     # My apps
     'commando',
+    'profiles',
+    'subscriptions',
+    'customers',
+    # Third Party Apps:
+    # -Django AllAuth and AllAuth-ui Apps:
+    "allauth_ui",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    "widget_tweaks",
+    "slippers",    
 ]
 
 MIDDLEWARE = [
@@ -57,6 +90,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # Django AllAuth Middleware:
+    "allauth.account.middleware.AccountMiddleware",
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -65,7 +100,7 @@ ROOT_URLCONF = 'base.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "base" /"templates"],
+        'DIRS': [ BASE_DIR / "base" /"templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,7 +129,7 @@ DATABASES = {
 CONN_MAX_AGE = config('CONN_MAX_AGE', cast=int, default=30)
 DATABASE_URL = config('DATABASE_URL', default=None)
 
-if DATABASE_URL is not None:
+if DATABASE_URL is not None and not DEBUG:
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
@@ -102,7 +137,7 @@ if DATABASE_URL is not None:
             conn_health_checks=True,
             conn_max_age=CONN_MAX_AGE,
             ),
-    }    
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -122,13 +157,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Django AllAuth Config:
+LOGIN_REDIRECT_URL='/'
+ACCOUNT_AUTHENTICATION_METHOD='username_email'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[STR]"
+ACCOUNT_EMAIL_REQUIRED=True
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        "VERIFIED_EMAIL": True,
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
