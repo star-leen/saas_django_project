@@ -20,7 +20,8 @@ from . import views
 from auth import views as auth_views
 
 urlpatterns = [
-    path('', views.home_view, name='home'),
+    path('', include('landing.urls')),    
+    # path('', views.home_view, name='home'),
     # path('login/', auth_views.login_view, name='login'),
     # path('register/', auth_views.register_view, name='register'),
     path('protected/user-only', views.user_only_view, name='user-only'),
